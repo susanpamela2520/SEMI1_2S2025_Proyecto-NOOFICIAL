@@ -1,0 +1,24 @@
+﻿Estimate summary
+Upfront cost,Monthly cost,Total 12 months cost,Currency
+0,9118.37,109420.44,USD
+,,* Includes upfront cost
+
+
+Detailed Estimate
+Group hierarchy,Region,Description,Service,Upfront,Monthly,First 12 months total,Currency,Status,Configuration summary
+CineMatch - Estimado,US East (Ohio),,Amazon EC2 ,0,3.796,45.55,USD,,"Tenancy (Shared Instances), Operating system (Linux), Workload (Consistent, Number of instances: 1), Advance EC2 instance (t3.micro), Pricing strategy (Compute Savings Plans 3yr  No Upfront), Enable monitoring (disabled), DT Inbound: Not selected (0 TB per month), DT Outbound: Not selected (0 TB per month), DT Intra-Region: (0 TB per month)"
+CineMatch - Estimado,US East (Ohio),,Amazon RDS for MySQL,0,27.96,335.52,USD,,"Storage amount (20 GB), Storage for each RDS instance (General Purpose SSD (gp2)), Nodes (1), Instance type (db.t4g.micro), Utilization (On-Demand only) (100 %Utilized/Month), Deployment option (Multi-AZ), Pricing strategy (OnDemand)"
+CineMatch - Estimado,US East (Ohio),,Classic Load Balancer,0,24.09,289.08,USD,,"Number of Classic Load Balancers (1), Processed bytes per CLB (1 GB per hour)"
+CineMatch - Estimado,US East (Ohio),,Standard Text-to-Speech,0,12,144.00,USD,,"Number of requests (Standard Text-to-Speech) (10000 per month), Number of characters per request including white spaces, but excluding SSML (300)"
+CineMatch - Estimado,US East (Ohio),,Rekognition Image,0,7.5,90.00,USD,,"Number of images processed with labels API calls per month ( per month), Number of images processed with Image Properties API calls per month (10000 per month)"
+CineMatch - Estimado,US East (Ohio),,S3 Standard,0,0.12,1.44,USD,,"S3 Standard storage (5 GB per month), GET, SELECT, and all other requests from S3 Standard (10000), Data returned by S3 Select (5 GB per month)"
+CineMatch - Estimado,US East (Ohio),,Data Transfer,0,0,0.00,USD,,
+CineMatch - Estimado,US East (Ohio),,Standard Text-to-Speech,0,12,144.00,USD,,"Number of requests (Standard Text-to-Speech) (10000 per month), Number of characters per request including white spaces, but excluding SSML (300)"
+CineMatch - Estimado,US East (Ohio),,Sentiment Analysis,0,0.9,10.80,USD,,"Number of documents asynchronous (3000), Average characters in a document asynchronous (300)"
+CineMatch - Estimado,US East (Ohio),,Amazon API Gateway,0,9030,108360.00,USD,,"HTTP API requests units (millions), Average size of each request (34 KB), REST API request units (millions), Cache memory size (GB) (None), WebSocket message units (thousands), Average message size (32 KB), Requests (10000 per month)"
+CineMatch - Estimado,US East (Ohio),,AWS Lambda,0,0,0.00,USD,,"Architecture (x86), Architecture (x86), Invoke Mode (Buffered), Amount of ephemeral storage allocated (512 MB), Number of requests (100000 per month)"
+
+
+
+Acknowledgement
+"* AWS Pricing Calculator provides only an estimate of your AWS fees and doesn't include any taxes that might apply. Your actual fees depend on a variety of factors, including your actual usage of AWS services."

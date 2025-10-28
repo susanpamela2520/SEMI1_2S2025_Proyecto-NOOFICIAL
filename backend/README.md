@@ -251,3 +251,24 @@ Ejemplo
 }
 
 ```
+## 8. Registrar una nueva pelicula - POST
+`/users/movies`
+```json
+// api recibe
+{
+  "title": "Interstellar",
+  "release_year": 2014,
+  "cover_url": "https://example.com/interstellar.jpg",
+  "genre_ids": [5, 6, 14]
+}
+
+// api devuelve
+{
+  "success": true,
+  "message": "Película registrada exitosamente",
+  "data": {
+    "movie_id": 101
+  }
+}
+
+```

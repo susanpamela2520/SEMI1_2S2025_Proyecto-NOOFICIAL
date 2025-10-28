@@ -1,0 +1,73 @@
+---
+config:
+  layout: elk
+---
+erDiagram
+	direction LR
+	USERS {
+		INT id PK ""  
+		VARCHAR full_name  ""  
+		VARCHAR username  ""  
+		VARCHAR email  ""  
+		TEXT password_hash  ""  
+		TEXT profile_photo_url  ""  
+		TIMESTAMP created_at  ""  
+	}
+	USER_FAVORITE_GENRES {
+		INT user_id PK ""  
+		INT genre_id PK ""  
+	}
+	GENRES {
+		INT id PK ""  
+		VARCHAR name  ""  
+	}
+	MOVIES {
+		INT id PK ""  
+		VARCHAR title  ""  
+		INT release_year  ""  
+		TEXT cover_url  ""  
+		TIMESTAMP created_at  ""  
+	}
+	MOVIE_GENRES {
+		INT movie_id PK ""  
+		INT genre_id PK ""  
+	}
+	REVIEWS {
+		INT id PK ""  
+		INT user_id  ""  
+		INT movie_id  ""  
+		INT rating  ""  
+		TEXT review_text  ""  
+		VARCHAR sentiment  ""  
+		TIMESTAMP created_at  ""  
+	}
+	REVIEW_EMOTIONS {
+		INT review_id PK ""  
+		INT emotion_id PK ""  
+	}
+	EMOTIONS {
+		INT id PK ""  
+		VARCHAR name  ""  
+	}
+	FAVORITES {
+		INT user_id PK ""  
+		INT movie_id PK ""  
+	}
+	WATCHED {
+		INT user_id PK ""  
+		INT movie_id PK ""  
+		TIMESTAMP watched_at  ""  
+	}
+
+	USERS||--o{USER_FAVORITE_GENRES:"has"
+	GENRES||--o{USER_FAVORITE_GENRES:"tagged"
+	MOVIES||--o{MOVIE_GENRES:"categorized"
+	GENRES||--o{MOVIE_GENRES:"belongs_to"
+	USERS||--o{REVIEWS:"writes"
+	MOVIES||--o{REVIEWS:"receives"
+	REVIEWS||--o{REVIEW_EMOTIONS:"expresses"
+	EMOTIONS||--o{REVIEW_EMOTIONS:"described_by"
+	USERS||--o{FAVORITES:"favorites"
+	MOVIES||--o{FAVORITES:"favorited"
+	USERS||--o{WATCHED:"watches"
+	MOVIES||--o{WATCHED:"watched"

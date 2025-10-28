@@ -111,6 +111,35 @@ router.get("/movies", async (req, res) => {
   }
 });
 
+// Agregar nueva película
+router.post("/movies", async (req, res) => {
+  try {
+    const { title, release_year, cover_url, genre_ids } = req.body;
+
+    if (!title || !release_year) {
+      return makeResponse(res, false, "Campos obligatorios: title y release_year");
+    }
+
+    const [result] = await pool.query(
+      `INSERT INTO movies (title, release_year, cover_url)
+       VALUES (?, ?, ?)`,
+      [title, release_year, cover_url]
+    );
+
+    const movie_id = result.insertId;
+
+    if (Array.isArray(genre_ids) && genre_ids.length > 0) {
+      const values = genre_ids.map(genre_id => [movie_id, genre_id]);
+      await pool.query(`INSERT INTO movie_genres (movie_id, genre_id) VALUES ?`, [values]);
+    }
+
+    return makeResponse(res, true, "Película registrada exitosamente", { movie_id });
+  } catch (err) {
+    return makeResponse(res, false, `Error al registrar película: ${err.message}`, 500);
+  }
+});
+
+
 // Registrar reseña de película
 router.post("/reviews", async (req, res) => {
   try {

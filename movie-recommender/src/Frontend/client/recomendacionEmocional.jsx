@@ -63,7 +63,7 @@ const recomendacionEmocional = () => {
 
     try {
       // Llamada al backend que usa Amazon Comprehend
-      const response = await fetch('TU_API_URL/recommendations/emotional', {
+      const response = await fetch('http://localhost:7000/recommendations/emotional', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

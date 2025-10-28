@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import './PosterRecognition.css';
+import './posterRecognition.css';
 
 const PosterRecognition = () => {
   const [selectedImage, setSelectedImage] = useState(null);

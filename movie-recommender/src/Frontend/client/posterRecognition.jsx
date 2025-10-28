@@ -1,6 +1,10 @@
 import { useState, useRef } from 'react';
+<<<<<<< HEAD
 import './PosterRecognition.css';
 import Navbar from './Navbar.jsx';
+=======
+import './posterRecognition.css';
+>>>>>>> 5f4c5e07ff44252a7896b8a4672e821a3efa94d7
 
 const PosterRecognition = () => {
   const [selectedImage, setSelectedImage] = useState(null);

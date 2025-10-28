@@ -11,8 +11,53 @@
 | 201906099  | Daniel Moisés Chan Pelico            |
 
 ## 2. Objetivos del proyecto
+
+El objetivo principal del proyecto es diseñar e implementar una arquitectura escalable y distribuida en AWS que permita gestionar de forma eficiente un sistema de usuarios y películas, integrando análisis automatizado de reseñas, reconocimiento de imágenes y servicios de traducción y voz.
+
+De forma específica, el proyecto busca:
+
+- Optimizar el acceso y la entrega de contenido a los usuarios mediante el uso de Amazon CloudFront y un sitio web estático alojado en Amazon S3, garantizando baja latencia y alta disponibilidad.
+
+- Implementar un backend distribuido con Elastic Load Balancer y dos instancias EC2 conectadas a una base de datos MySQL en Amazon RDS, para almacenar información de usuarios, películas, reseñas, películas vistas y favoritas.
+
+- Incorporar inteligencia artificial y automatización a través de AWS Lambda, permitiendo la integración con servicios cognitivos como Rekognition, Polly, Comprehend y Translate para el análisis multimedia y de texto.
+
+- Facilitar la gestión de archivos multimedia, permitiendo que los usuarios suban imágenes de perfil y portadas de películas directamente a Amazon S3 mediante funciones Lambda.
+
+En conjunto, estos objetivos buscan demostrar una solución moderna basada en la nube que combine rendimiento, escalabilidad, inteligencia artificial y experiencia de usuario mejorada.
+
 ## 3. Descripción del proyecto
+El proyecto consiste en el desarrollo de una plataforma web alojada completamente en la nube de AWS, diseñada para la gestión y análisis de contenido cinematográfico generado por usuarios.
+
+El sistema se estructura en varias capas conectadas entre sí:
+
+1. Capa de acceso (Frontend):
+El usuario interactúa con la aplicación a través de un sitio web estático distribuido por Amazon CloudFront, cuyo contenido se encuentra hospedado en un bucket de Amazon S3. Esta configuración permite una entrega rápida del frontend y una experiencia fluida a nivel global.
+
+2. Capa de aplicación (Backend):
+Las solicitudes del frontend son procesadas mediante un Elastic Load Balancer, que distribuye el tráfico entre dos instancias EC2 responsables de manejar la lógica de negocio principal.
+Ambas instancias se conectan a una base de datos MySQL en Amazon RDS, donde se almacenan los datos de usuarios, películas, películas vistas, favoritas y las reseñas realizadas.
+
+3. Capa de servicios inteligentes (Serverless):
+Paralelamente, el frontend también se comunica con API Gateway, que actúa como punto de entrada para las solicitudes dirigidas a funciones AWS Lambda.
+Estas funciones permiten integrar servicios de inteligencia artificial:
+
+    - Amazon Rekognition: identifica portadas de películas mediante reconocimiento de imágenes.
+
+    - Amazon Polly: convierte las reseñas escritas por usuarios en voz, ofreciendo accesibilidad y dinamismo.
+
+    - Amazon Comprehend: analiza el sentimiento expresado en las reseñas (positivo, negativo o neutro).
+
+    - Amazon Translate: traduce reseñas a diferentes idiomas para usuarios internacionales.
+
+    - Funciones adicionales Lambda: permiten subir imágenes de perfil y portadas al bucket S3.
+
+En conjunto, esta arquitectura aprovecha los servicios gestionados de AWS para ofrecer una plataforma altamente escalable, inteligente, segura y con tiempos de respuesta optimizados, orientada a la experiencia del usuario y al análisis automatizado de contenido.
+
 ## 4. Arquitectura implementada
+
+![Arquitectura](img/Arquitectura.png)
+
 ## 5. Presupuesto del proyecto
 El presupuesto del proyecto se realiza utilizando la herramienta AWS Pricing Calculator. Ver presupuesto detallado [Presupuesto](https://calculator.aws/#/estimate?id=49cc2c6c5e3d9228004a82932d301c04b2540c8d)
 
@@ -111,7 +156,7 @@ Ventajas:
 - Alta calidad de traducción con redes neuronales.
 - Integración con S3, Lambda y otros servicios.
 
-### 6.4 Amazon Polly
+### 6.5 Amazon Polly
 Descripción:
 Convierte texto en voz realista mediante tecnologías de text-to-speech (TTS).
 
@@ -133,7 +178,7 @@ Ventajas:
 - Generación bajo demanda o por lotes.
 - Escalable y de bajo costo.
 
-### 6.4 Amazon Comprehend
+### 6.6 Amazon Comprehend
 Descripción:
 Servicio de procesamiento de lenguaje natural (NLP) que usa machine learning para analizar texto y extraer significado.
 
@@ -156,7 +201,7 @@ Ventajas:
 - Compatible con datos en S3 y bases de datos AWS.
 - Escalable y personalizable.
 
-### 6.4 Amazon Rekognition
+### 6.7 Amazon Rekognition
 Descripción:
 Servicio de visión artificial que analiza imágenes y videos usando redes neuronales profundas.
 
@@ -179,7 +224,7 @@ Ventajas:
 - Integración con S3, Lambda y Kinesis Video Streams.
 - Escalabilidad y análisis en tiempo real.
 
-### 6.4 Amazon Api Gateway
+### 6.8 Amazon Api Gateway
 Descripción:
 Permite crear, publicar y gestionar APIs de forma segura y escalable. Es un punto de entrada para microservicios o backends sin servidor.
 
@@ -200,3 +245,30 @@ Ventajas:
 - Escalable automáticamente.
 - Seguridad integrada.
 - Compatible con múltiples protocolos.
+
+### 6.9 Amazon CloudFront
+Descripción:
+Amazon CloudFront es un servicio de red de entrega de contenido (CDN) que distribuye datos, videos, aplicaciones y API de manera global con baja latencia y alta velocidad de transferencia. Se integra de forma nativa con otros servicios de AWS, como Amazon S3, EC2, API Gateway, Elastic Load Balancing y Lambda@Edge, lo que permite acelerar la entrega de contenido estático y dinámico a los usuarios finales.
+
+Características:
+
+- Red global con más de 400 puntos de presencia (Edge Locations) distribuidos en múltiples regiones.
+- Compatibilidad con contenido estático y dinámico, así como transmisión de video en tiempo real (live streaming).
+- Integración con AWS Shield y AWS WAF para proteger contra ataques DDoS y vulnerabilidades comunes.
+- Soporte para TLS/SSL, autenticación mediante firmas, y control de acceso a contenido privado.
+- Caché configurable y políticas de expiración flexibles para optimizar el rendimiento y reducir costos.
+
+Casos de uso:
+
+- Aceleración del acceso a sitios web y aplicaciones alojadas en Amazon S3 o servidores EC2.
+- Distribución global de archivos multimedia (imágenes, videos, música, juegos).
+- Optimización de APIs distribuidas a través de API Gateway.
+- Transmisión de contenido en vivo o bajo demanda (video streaming).
+
+Ventajas:
+
+- Baja latencia: entrega del contenido desde el punto geográficamente más cercano al usuario.
+- Escalabilidad automática: maneja grandes volúmenes de tráfico sin intervención manual.
+- Alta seguridad: integración con servicios de protección de red de AWS.
+- Reducción de costos: disminuye la carga de los servidores de origen y el consumo de ancho de banda.
+- Integración perfecta: funciona en conjunto con S3, Load Balancer, EC2 y Lambda para ofrecer una arquitectura moderna y eficiente.

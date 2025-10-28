@@ -45,6 +45,16 @@ router.post("/register", async (req, res) => {
       return makeResponse(res, false, "Campos obligatorios: full_name, username, email, password");
     }
 
+    // Verificar si el username o email ya existen
+    const [existing] = await pool.query(
+      `SELECT id FROM users WHERE username = ? OR email = ?`,
+      [username, email]
+    );
+
+    if (existing.length > 0) {
+      return makeResponse(res, false, "El nombre de usuario o correo ya están registrados");
+    }
+
     const password_hash = md5(password);
     const [result] = await pool.query(
       `INSERT INTO users (full_name, username, email, password_hash, profile_photo_url)
@@ -64,6 +74,7 @@ router.post("/register", async (req, res) => {
     return makeResponse(res, false, `Error al registrar usuario: ${err.message}`, 500);
   }
 });
+
 
 // Obtener Peliculas
 router.get("/movies", async (req, res) => {

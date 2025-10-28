@@ -106,7 +106,7 @@ El atributo `data` incluye un json o arreglo de jsons con los resultados a utili
 }
 ```
 ## 3. Obtener datos de peliculas - GET
-`GET /movies?release_year=2022&rating_min=4.0&genre_ids=1&genre_ids=6`
+`GET /users/movies?release_year=2022&rating_min=4.0&genre_ids=1&genre_ids=6`
 ```json
 // api devuelve
 {
@@ -127,7 +127,7 @@ El atributo `data` incluye un json o arreglo de jsons con los resultados a utili
   }
 }
 ```
-`GET /movies?title=Star&rating_min=3.5&rating_max=5.0`
+`GET /users/movies?title=Star&rating_min=3.5&rating_max=5.0`
 ```json
 // api devuelve
 {
@@ -157,7 +157,7 @@ El atributo `data` incluye un json o arreglo de jsons con los resultados a utili
   }
 }
 ```
-`GET /movies?genre_ids=3&genre_ids=9`
+`GET /users/movies?genre_ids=3&genre_ids=9`
 ```json
 // api devuelve
 {
@@ -178,8 +178,34 @@ El atributo `data` incluye un json o arreglo de jsons con los resultados a utili
   }
 }
 ```
+## 4. Obtener pelicula por ID - GET
+`/users/movies/:id`
+`/users/movies/101`
 
-## 3. Publicar reseña - POST
+```json
+// Api responde
+{
+  "success": true,
+  "message": "Película obtenida",
+  "data": {
+    "movie": {
+      "id": 101,
+      "title": "Interstellar",
+      "release_year": 2014,
+      "cover_url": "https://example.com/interstellar.jpg",
+      "average_rating": 4.6,
+      "review_count": 120,
+      "genres": [
+        { "id": 5, "name": "Fantasía" },
+        { "id": 6, "name": "Ciencia Ficción" },
+        { "id": 14, "name": "Misterio" }
+      ]
+    }
+  }
+}
+```
+
+## 5. Publicar reseña - POST
 ``/users/reviews`
 ```json
 // api recibe
@@ -199,7 +225,7 @@ El atributo `data` incluye un json o arreglo de jsons con los resultados a utili
   "data": {}
 }
 ```
-## 4. Agregar a favoritos - POST
+## 6. Agregar a favoritos - POST
 `/users/favorites`
 ```json
 // api recibe
@@ -216,7 +242,7 @@ El atributo `data` incluye un json o arreglo de jsons con los resultados a utili
 }
 
 ```
-## 4. Agregar pelicula vista - POST
+## 7. Agregar pelicula vista - POST
 `/users/watched`
 ```json
 // api recibe
@@ -233,7 +259,7 @@ El atributo `data` incluye un json o arreglo de jsons con los resultados a utili
 }
 
 ```
-## 5. Perfil de usuario - GET
+## 8. Perfil de usuario - GET
 ``/users/profile/:id`
 Ejemplo 
 ``/users/profile/42`
@@ -267,7 +293,7 @@ Ejemplo
 }
 
 ```
-## 6. Listar emociones (para rellenar dropdowns) - GET
+## 9. Listar emociones (para rellenar dropdowns) - GET
 `/users/emotions`
 ```json
 // api devuelve
@@ -283,7 +309,7 @@ Ejemplo
   }
 }
 ```
-## 7. Listar Generos (para rellenar dropdowns) - GET
+## 10. Listar Generos (para rellenar dropdowns) - GET
 `/users/genres`
 ```json
 // api devuelve
@@ -300,7 +326,7 @@ Ejemplo
 }
 
 ```
-## 8. Registrar una nueva pelicula - POST
+## 11. Registrar una nueva pelicula - POST
 `/users/movies`
 ```json
 // api recibe

@@ -138,6 +138,49 @@ router.get("/movies", async (req, res) => {
   }
 });
 
+// Obtener una película por ID
+router.get("/movies/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Obtener datos de la película
+    const [movieRows] = await pool.query(`
+      SELECT 
+        m.id, 
+        m.title, 
+        m.release_year, 
+        m.cover_url,
+        ROUND(AVG(r.rating), 2) AS average_rating,
+        COUNT(r.id) AS review_count
+      FROM movies m
+      LEFT JOIN reviews r ON m.id = r.movie_id
+      WHERE m.id = ?
+      GROUP BY m.id
+    `, [id]);
+
+    if (movieRows.length === 0) {
+      return makeResponse(res, false, "Película no encontrada", {}, 404);
+    }
+
+    const movie = movieRows[0];
+
+    // Obtener géneros como arreglo
+    const [genreRows] = await pool.query(`
+      SELECT g.id, g.name
+      FROM movie_genres mg
+      JOIN genres g ON mg.genre_id = g.id
+      WHERE mg.movie_id = ?
+    `, [id]);
+
+    movie.genres = genreRows;
+
+    return makeResponse(res, true, "Película obtenida", { movie });
+  } catch (err) {
+    return makeResponse(res, false, `Error al obtener película: ${err.message}`, 500);
+  }
+});
+
+
 // Agregar nueva película
 router.post("/movies", async (req, res) => {
   try {

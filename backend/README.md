@@ -106,10 +106,7 @@ El atributo `data` incluye un json o arreglo de jsons con los resultados a utili
 }
 ```
 ## 3. Obtener datos de peliculas - GET
-`/users/movies`
-`/users/movies?genre_id=3`
-`/users/movies?genre_id=3&release_year=2022`
-`/users/movies?genre_id=3&release_year=2022&title=Matrix`
+`GET /movies?release_year=2022&rating_min=4.0&genre_ids=1&genre_ids=6`
 ```json
 // api devuelve
 {
@@ -118,18 +115,70 @@ El atributo `data` incluye un json o arreglo de jsons con los resultados a utili
   "data": {
     "movies": [
       {
-        "id": 12,
+        "id": 101,
         "title": "Matrix Resurrections",
         "release_year": 2022,
         "cover_url": "https://example.com/matrix.jpg",
-        "average_rating": 4.2,
-        "review_count": 87
+        "average_rating": 4.3,
+        "review_count": 87,
+        "genres": "Acción, Ciencia Ficción"
       }
     ]
   }
 }
-
 ```
+`GET /movies?title=Star&rating_min=3.5&rating_max=5.0`
+```json
+// api devuelve
+{
+  "success": true,
+  "message": "Películas obtenidas",
+  "data": {
+    "movies": [
+      {
+        "id": 88,
+        "title": "Star Wars: A New Hope",
+        "release_year": 1977,
+        "cover_url": "https://example.com/starwars.jpg",
+        "average_rating": 4.8,
+        "review_count": 120,
+        "genres": "Ciencia Ficción, Aventura"
+      },
+      {
+        "id": 89,
+        "title": "Star Trek Into Darkness",
+        "release_year": 2013,
+        "cover_url": "https://example.com/startrek.jpg",
+        "average_rating": 4.1,
+        "review_count": 95,
+        "genres": "Ciencia Ficción, Acción"
+      }
+    ]
+  }
+}
+```
+`GET /movies?genre_ids=3&genre_ids=9`
+```json
+// api devuelve
+{
+  "success": true,
+  "message": "Películas obtenidas",
+  "data": {
+    "movies": [
+      {
+        "id": 55,
+        "title": "10 Things I Hate About You",
+        "release_year": 1999,
+        "cover_url": "https://example.com/10things.jpg",
+        "average_rating": 4.0,
+        "review_count": 60,
+        "genres": "Comedia, Romance"
+      }
+    ]
+  }
+}
+```
+
 ## 3. Publicar reseña - POST
 ``/users/reviews`
 ```json

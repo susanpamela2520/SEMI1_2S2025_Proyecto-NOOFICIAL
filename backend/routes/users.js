@@ -79,30 +79,57 @@ router.post("/register", async (req, res) => {
 // Obtener Peliculas
 router.get("/movies", async (req, res) => {
   try {
-    const { genre_id, release_year, title } = req.query;
+    const { release_year, title, rating_min, rating_max, genre_ids } = req.query;
 
     let query = `
-      SELECT m.id, m.title, m.release_year, m.cover_url,
-        (SELECT AVG(rating) FROM reviews WHERE movie_id = m.id) AS average_rating,
-        (SELECT COUNT(*) FROM reviews WHERE movie_id = m.id) AS review_count
+      SELECT 
+        m.id, 
+        m.title, 
+        m.release_year, 
+        m.cover_url,
+        ROUND(AVG(r.rating), 2) AS average_rating,
+        COUNT(r.id) AS review_count,
+        GROUP_CONCAT(DISTINCT g.name SEPARATOR ', ') AS genres
       FROM movies m
+      LEFT JOIN reviews r ON m.id = r.movie_id
       LEFT JOIN movie_genres mg ON m.id = mg.movie_id
+      LEFT JOIN genres g ON mg.genre_id = g.id
       WHERE 1=1
     `;
     const params = [];
 
-    if (genre_id) {
-      query += " AND mg.genre_id = ?";
-      params.push(genre_id);
-    }
     if (release_year) {
       query += " AND m.release_year = ?";
       params.push(release_year);
     }
+
     if (title) {
       query += " AND m.title LIKE ?";
       params.push(`%${title}%`);
     }
+
+    if (rating_min) {
+      query += " AND (SELECT AVG(r2.rating) FROM reviews r2 WHERE r2.movie_id = m.id) >= ?";
+      params.push(rating_min);
+    }
+
+    if (rating_max) {
+      query += " AND (SELECT AVG(r2.rating) FROM reviews r2 WHERE r2.movie_id = m.id) <= ?";
+      params.push(rating_max);
+    }
+
+    if (genre_ids) {
+      const genreArray = Array.isArray(genre_ids) ? genre_ids : [genre_ids];
+      const placeholders = genreArray.map(() => '?').join(',');
+      query += ` AND m.id IN (
+        SELECT movie_id FROM movie_genres WHERE genre_id IN (${placeholders})
+        GROUP BY movie_id
+        HAVING COUNT(DISTINCT genre_id) = ?
+      )`;
+      params.push(...genreArray, genreArray.length);
+    }
+
+    query += " GROUP BY m.id";
 
     const [rows] = await pool.query(query, params);
     return makeResponse(res, true, "Películas obtenidas", { movies: rows });

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import './recomendacionEmocional.css';
+import Navbar from './Navbar.jsx';
 
 const recomendacionEmocional = () => {
   const [emotionalText, setEmotionalText] = useState('');
@@ -310,6 +311,8 @@ const recomendacionEmocional = () => {
   };
 
   return (
+    <>
+      <Navbar currentPage="Recomendación Emocional" />
     <div className="emotional-recommendations-container">
       <div className="emotional-header">
         <h1>🎭 Recomendaciones por Estado Emocional</h1>
@@ -516,6 +519,7 @@ const recomendacionEmocional = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import './catalogo.css';
+import Navbar from './Navbar';
 
 const Catalogo = () => {
   const [catalogo, setCatalogo] = useState([]);
@@ -17,6 +18,18 @@ const Catalogo = () => {
     selectedYear: '',
     minRating: 0
   });
+
+  // Estados del formulario de nueva película
+  const [showAddMovieModal, setShowAddMovieModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [newMovie, setNewMovie] = useState({
+    title: '',
+    release_year: '',
+    cover_url: '',
+    genre_ids: []
+  });
+  const [formErrors, setFormErrors] = useState({});
+  const [submitMessage, setSubmitMessage] = useState({ type: '', text: '' });
 
   // Opciones de filtros
   const years = Array.from({ length: 50 }, (_, i) => 2024 - i);
@@ -297,6 +310,149 @@ const Catalogo = () => {
     });
   };
 
+  // Funciones para el formulario de nueva película
+  const handleOpenAddMovie = () => {
+    setShowAddMovieModal(true);
+    setNewMovie({
+      title: '',
+      release_year: '',
+      cover_url: '',
+      genre_ids: []
+    });
+    setFormErrors({});
+    setSubmitMessage({ type: '', text: '' });
+  };
+
+  const handleCloseAddMovie = () => {
+    setShowAddMovieModal(false);
+    setNewMovie({
+      title: '',
+      release_year: '',
+      cover_url: '',
+      genre_ids: []
+    });
+    setFormErrors({});
+    setSubmitMessage({ type: '', text: '' });
+  };
+
+  const handleMovieInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewMovie({
+      ...newMovie,
+      [name]: value
+    });
+    // Limpiar error del campo cuando el usuario empieza a escribir
+    if (formErrors[name]) {
+      setFormErrors({
+        ...formErrors,
+        [name]: ''
+      });
+    }
+  };
+
+  const handleGenreSelection = (genreId) => {
+    const isSelected = newMovie.genre_ids.includes(genreId);
+    if (isSelected) {
+      setNewMovie({
+        ...newMovie,
+        genre_ids: newMovie.genre_ids.filter(id => id !== genreId)
+      });
+    } else {
+      setNewMovie({
+        ...newMovie,
+        genre_ids: [...newMovie.genre_ids, genreId]
+      });
+    }
+  };
+
+  const validateForm = () => {
+    const errors = {};
+    
+    if (!newMovie.title.trim()) {
+      errors.title = 'El título es obligatorio';
+    }
+    
+    if (!newMovie.release_year) {
+      errors.release_year = 'El año de lanzamiento es obligatorio';
+    } else {
+      const year = parseInt(newMovie.release_year);
+      const currentYear = new Date().getFullYear();
+      if (year < 1888 || year > currentYear + 5) {
+        errors.release_year = `El año debe estar entre 1888 y ${currentYear + 5}`;
+      }
+    }
+
+    if (newMovie.cover_url && !isValidUrl(newMovie.cover_url)) {
+      errors.cover_url = 'La URL de la portada no es válida';
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const isValidUrl = (string) => {
+    try {
+      new URL(string);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  };
+
+  const handleSubmitMovie = async (e) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitMessage({ type: '', text: '' });
+
+    try {
+      const response = await fetch('http://localhost:7000/users/movies', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          title: newMovie.title.trim(),
+          release_year: parseInt(newMovie.release_year),
+          cover_url: newMovie.cover_url.trim() || null,
+          genre_ids: newMovie.genre_ids
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setSubmitMessage({ 
+          type: 'success', 
+          text: '¡Película registrada exitosamente!' 
+        });
+        
+        // Recargar el catálogo después de 1.5 segundos
+        setTimeout(() => {
+          fetchCatalogo();
+          handleCloseAddMovie();
+        }, 1500);
+      } else {
+        setSubmitMessage({ 
+          type: 'error', 
+          text: data.message || 'Error al registrar la película' 
+        });
+      }
+    } catch (error) {
+      console.error('Error al registrar película:', error);
+      setSubmitMessage({ 
+        type: 'error', 
+        text: 'Error de conexión. Verifica que el servidor esté funcionando.' 
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
       setCurrentPage(newPage);
@@ -328,7 +484,9 @@ const Catalogo = () => {
   const paginatedCatalogo = displayedCatalogo.slice(startIndex, endIndex);
 
   return (
-    <div className="movies-container">
+    <>
+      <Navbar currentPage="Catálogo" />
+      <div className="movies-container">
       {/* Header */}
       <div className="movies-header">
         <h1>🎬 Explora Películas</h1>
@@ -536,6 +694,156 @@ const Catalogo = () => {
         </>
       )}
     </div>
+
+    {/* Botón Flotante para Agregar Película */}
+    <button 
+      className="fab-add-movie" 
+      onClick={handleOpenAddMovie}
+      title="Agregar nueva película"
+    >
+      <span className="fab-icon">+</span>
+    </button>
+
+    {/* Modal de Agregar Película */}
+    {showAddMovieModal && (
+      <div className="modal-overlay" onClick={handleCloseAddMovie}>
+        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-header">
+            <h2 className="modal-title">🎬 Agregar Nueva Película</h2>
+            <button className="modal-close-btn" onClick={handleCloseAddMovie}>
+              ✕
+            </button>
+          </div>
+
+          <form onSubmit={handleSubmitMovie} className="movie-form">
+            {/* Mensaje de éxito/error */}
+            {submitMessage.text && (
+              <div className={`form-alert ${submitMessage.type}`}>
+                {submitMessage.type === 'success' ? '✅' : '❌'} {submitMessage.text}
+              </div>
+            )}
+
+            {/* Campo: Título */}
+            <div className="form-group">
+              <label htmlFor="title" className="form-label">
+                Título <span className="required">*</span>
+              </label>
+              <input
+                type="text"
+                id="title"
+                name="title"
+                value={newMovie.title}
+                onChange={handleMovieInputChange}
+                className={`form-input ${formErrors.title ? 'error' : ''}`}
+                placeholder="Ej: Inception"
+                disabled={isSubmitting}
+              />
+              {formErrors.title && (
+                <span className="form-error">{formErrors.title}</span>
+              )}
+            </div>
+
+            {/* Campo: Año de Lanzamiento */}
+            <div className="form-group">
+              <label htmlFor="release_year" className="form-label">
+                Año de Lanzamiento <span className="required">*</span>
+              </label>
+              <input
+                type="number"
+                id="release_year"
+                name="release_year"
+                value={newMovie.release_year}
+                onChange={handleMovieInputChange}
+                className={`form-input ${formErrors.release_year ? 'error' : ''}`}
+                placeholder="Ej: 2024"
+                min="1888"
+                max={new Date().getFullYear() + 5}
+                disabled={isSubmitting}
+              />
+              {formErrors.release_year && (
+                <span className="form-error">{formErrors.release_year}</span>
+              )}
+            </div>
+
+            {/* Campo: URL de Portada */}
+            <div className="form-group">
+              <label htmlFor="cover_url" className="form-label">
+                URL de Portada (Opcional)
+              </label>
+              <input
+                type="url"
+                id="cover_url"
+                name="cover_url"
+                value={newMovie.cover_url}
+                onChange={handleMovieInputChange}
+                className={`form-input ${formErrors.cover_url ? 'error' : ''}`}
+                placeholder="https://ejemplo.com/imagen.jpg"
+                disabled={isSubmitting}
+              />
+              {formErrors.cover_url && (
+                <span className="form-error">{formErrors.cover_url}</span>
+              )}
+              <span className="form-hint">
+                Si no proporcionas una URL, se usará una imagen por defecto
+              </span>
+            </div>
+
+            {/* Selección de Géneros */}
+            <div className="form-group">
+              <label className="form-label">
+                Géneros (Opcional)
+              </label>
+              <div className="genre-selection">
+                {genres.map((genre) => (
+                  <button
+                    key={genre.id}
+                    type="button"
+                    className={`genre-tag ${newMovie.genre_ids.includes(genre.id) ? 'selected' : ''}`}
+                    onClick={() => handleGenreSelection(genre.id)}
+                    disabled={isSubmitting}
+                  >
+                    {genre.name}
+                  </button>
+                ))}
+              </div>
+              <span className="form-hint">
+                Selecciona uno o más géneros para la película
+              </span>
+            </div>
+
+            {/* Botones de acción */}
+            <div className="form-actions">
+              <button
+                type="button"
+                className="btn-cancel"
+                onClick={handleCloseAddMovie}
+                disabled={isSubmitting}
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                className="btn-submit"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <span className="spinner-small"></span>
+                    Guardando...
+                  </>
+                ) : (
+                  <>
+                    <span>💾</span>
+                    Guardar Película
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    )}
+    </>
   );
 };
 

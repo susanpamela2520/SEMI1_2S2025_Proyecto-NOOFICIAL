@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import './resenasMovie.css';
+import Navbar from './Navbar.jsx';
 
 const resenasMovie = ({ movieId }) => {
   const [reviews, setReviews] = useState([]);
@@ -302,6 +303,8 @@ const resenasMovie = ({ movieId }) => {
   };
 
   return (
+    <>
+    <Navbar currentPage="Reseñas de Película" />
     <div className="movie-reviews-container">
       <div className="reviews-header">
         <h2>Reseñas de Usuarios</h2>
@@ -518,6 +521,7 @@ const resenasMovie = ({ movieId }) => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

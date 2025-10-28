@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import './PosterRecognition.css';
+import Navbar from './Navbar.jsx';
 
 const PosterRecognition = () => {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -275,6 +276,8 @@ const PosterRecognition = () => {
   };
 
   return (
+    <>
+      <Navbar currentPage="Reconocimiento de Carátulas" />
     <div className="poster-recognition-container">
       <div className="recognition-header">
         <h1>🎬 Reconocimiento de Carátulas</h1>
@@ -595,6 +598,8 @@ const PosterRecognition = () => {
         </div>
       </div>
     </div>
+    </>
+
   );
 };
 

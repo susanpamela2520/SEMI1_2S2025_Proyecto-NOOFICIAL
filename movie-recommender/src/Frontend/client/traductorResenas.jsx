@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import './traductorResenas.css';
+import './traductorResenas.css';  
+import Navbar from './Navbar.jsx';
 
 const TraductorResenas = ({ movieId }) => {
   const [reviews, setReviews] = useState([]);
@@ -282,6 +283,8 @@ const TraductorResenas = ({ movieId }) => {
   };
 
   return (
+    <>
+      <Navbar currentPage="Traducción de Reseñas" />
     <div className="reviews-with-translation-container">
       {/* Header */}
       <div className="reviews-header">
@@ -500,6 +503,7 @@ const TraductorResenas = ({ movieId }) => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

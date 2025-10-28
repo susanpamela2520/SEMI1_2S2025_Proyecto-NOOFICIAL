@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import './perfil.css';
+import Navbar from './Navbar';
 
 const perfil = ({ userId }) => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -396,6 +397,8 @@ const perfil = ({ userId }) => {
   }
 
   return (
+    <>
+      <Navbar currentPage="Perfil" />
     <div className="user-profile-container">
       {/* Cover Photo & Profile Header */}
       <div className="profile-header">
@@ -928,6 +931,7 @@ const perfil = ({ userId }) => {
         </div>
       )}
     </div>
+    </>
   );
 };
 

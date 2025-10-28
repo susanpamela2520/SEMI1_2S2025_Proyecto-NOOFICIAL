@@ -209,7 +209,7 @@ const Register = () => {
 
       // Conectar con tu endpoint de registro
       // Ajusta la URL base según tu configuración
-      const response = await fetch('http://localhost:7000/register', {
+      const response = await fetch('http://localhost:7000/users/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -252,7 +252,7 @@ const Register = () => {
       // navigate('/login');
       
       // Si usas window.location:
-      window.location.href = '/login';
+    navigate('/');
 
     } catch (error) {
       console.error('Error en el registro:', error);

@@ -9,9 +9,7 @@ import Catalogo from './Frontend/client/catalogo';
 import LecturaResenas from './Frontend/client/lecturaResenas';
 import TraductorResenas from './Frontend/client/traductorResenas';
 import Perfil from './Frontend/client/perfil';
-import GestionUsuario from './Frontend/admin/GestionUsuario';
-import ModeracionResena from './Frontend/admin/ModeracionResena';
-import GestionPeliculas from './Frontend/admin/GestionPeliculas';
+
 
 
 function App() {
@@ -28,9 +26,7 @@ function App() {
         <Route path="/lecturaResenas" element={<LecturaResenas />} />
         <Route path="/traductorResenas" element={<TraductorResenas />} />
         <Route path="/perfil" element={<Perfil />} />
-        <Route path="/gestionUsuario" element={<GestionUsuario />} />
-        <Route path="/moderacionResena" element={<ModeracionResena />} />
-        <Route path="/gestionPeliculas" element={<GestionPeliculas />} />
+        
 
       </Routes>
     </BrowserRouter>

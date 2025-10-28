@@ -62,7 +62,7 @@ const Login = () => {
     try {
       // Conectando con tu endpoint de login
       // Ajusta la URL base según tu configuración (localhost:7000, tu dominio, etc.)
-      const response = await fetch('http://localhost:7000/login', {
+      const response = await fetch('http://localhost:7000/users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -103,8 +103,7 @@ const Login = () => {
       // Redirigir al dashboard o página principal
       console.log('Login exitoso:', data);
       
-      // Descomentar y ajustar cuando tengas React Router configurado:
-      // navigate('/dashboard');
+      navigate('/catalogo');
       
       // O si usas window.location:
       // window.location.href = '/dashboard';

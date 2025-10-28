@@ -13,6 +13,9 @@
 ## 2. Objetivos del proyecto
 ## 3. Descripción del proyecto
 ## 4. Arquitectura implementada
+
+![Arquitectura](img/Arquitectura.png)
+
 ## 5. Presupuesto del proyecto
 El presupuesto del proyecto se realiza utilizando la herramienta AWS Pricing Calculator. Ver presupuesto detallado [Presupuesto](https://calculator.aws/#/estimate?id=49cc2c6c5e3d9228004a82932d301c04b2540c8d)
 

@@ -180,7 +180,7 @@ const PosterRecognition = () => {
     setSuccessMessage('');
 
     try {
-      const response = await fetch('TU_API_URL/movies/watched', {
+      const response = await fetch('http://localhost:7000/movies/watched', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -216,7 +216,7 @@ const PosterRecognition = () => {
     setSuccessMessage('');
 
     try {
-      const response = await fetch('TU_API_URL/movies/favorites', {
+      const response = await fetch('http://localhost:7000/movies/favorites', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

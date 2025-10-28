@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
 import './catalogo.css';
 
-const Movies = () => {
-  const [movies, setMovies] = useState([]);
-  const [filteredMovies, setFilteredMovies] = useState([]);
+const Catalogo = () => {
+  const [catalogo, setCatalogo] = useState([]);
+  const [filteredCatalogo, setFilteredCatalogo] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const moviesPerPage = 12;
+  const catalogoPerPage = 12;
+  const [genres, setGenres] = useState([]);
 
+  // Estados de filtros
   const [filters, setFilters] = useState({
     searchTerm: '',
     selectedGenres: [],
@@ -16,12 +18,7 @@ const Movies = () => {
     minRating: 0
   });
 
-  const genres = [
-    'Acción', 'Aventura', 'Comedia', 'Drama', 'Terror',
-    'Ciencia Ficción', 'Romance', 'Thriller', 'Animación',
-    'Documental', 'Fantasía', 'Crimen'
-  ];
-
+  // Opciones de filtros
   const years = Array.from({ length: 50 }, (_, i) => 2024 - i);
 
   const ratings = [
@@ -32,93 +29,274 @@ const Movies = () => {
     { label: '4+ ⭐', value: 4 }
   ];
 
+  // Cargar géneros al montar el componente
   useEffect(() => {
-    fetchMovies();
-  }, [currentPage]);
+    fetchGenres();
+  }, []);
 
+  // Cargar películas desde la API
+  useEffect(() => {
+    fetchCatalogo();
+  }, []);
+
+  // Aplicar filtros cuando cambien
   useEffect(() => {
     applyFilters();
-  }, [filters, movies]);
+  }, [filters, catalogo]);
 
-  const fetchMovies = async () => {
+  const fetchGenres = async () => {
+    try {
+      const response = await fetch('http://localhost:7000/users/genres', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al cargar géneros');
+      }
+
+      const data = await response.json();
+      
+      if (data.success && data.data.genres) {
+        setGenres(data.data.genres);
+      }
+    } catch (error) {
+      console.error('Error al cargar géneros:', error);
+      // Géneros por defecto si falla la API
+      setGenres([
+        { id: 1, name: 'Acción' },
+        { id: 2, name: 'Aventura' },
+        { id: 3, name: 'Comedia' },
+        { id: 4, name: 'Drama' },
+        { id: 5, name: 'Terror' },
+        { id: 6, name: 'Ciencia Ficción' },
+        { id: 7, name: 'Romance' },
+        { id: 8, name: 'Thriller' },
+        { id: 9, name: 'Animación' },
+        { id: 10, name: 'Documental' },
+        { id: 11, name: 'Fantasía' },
+        { id: 12, name: 'Crimen' }
+      ]);
+    }
+  };
+
+  const fetchCatalogo = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(
-        `TU_API_URL/movies?page=${currentPage}&limit=${moviesPerPage}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('authToken') || sessionStorage.getItem('authToken')}`
-          }
-        }
-      );
+      // Cargar todas las películas (sin filtros, se aplicarán en el frontend)
+      const url = `http://localhost:7000/users/movies`;
 
-      if (!response.ok) throw new Error('Error al cargar películas');
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al cargar películas');
+      }
+
       const data = await response.json();
-      setMovies(data.movies);
-      setTotalPages(data.totalPages);
+      
+      if (data.success && data.data.movies) {
+        // Mapear los datos de la API al formato esperado por el componente
+        const formattedMovies = data.data.movies.map(movie => ({
+          id: movie.id,
+          title: movie.title,
+          posterUrl: movie.cover_url || `https://picsum.photos/300/450?random=${movie.id}`,
+          year: movie.release_year,
+          genreIds: [], // Se llenará después
+          genreNames: '', // Se llenará después
+          averageRating: parseFloat(movie.average_rating || 0).toFixed(1),
+          reviewCount: parseInt(movie.review_count || 0)
+        }));
+
+        setCatalogo(formattedMovies);
+        setTotalPages(Math.ceil(formattedMovies.length / catalogoPerPage));
+        
+        // Cargar géneros de películas después de tener la lista de géneros
+        if (genres.length > 0) {
+          fetchAllMovieGenres(formattedMovies);
+        }
+      } else {
+        throw new Error('Formato de respuesta inválido');
+      }
+      
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error al cargar películas:', error);
+      // Datos de ejemplo para desarrollo si falla la API
       loadMockData();
     } finally {
       setIsLoading(false);
     }
   };
 
+  const fetchAllMovieGenres = async (movies) => {
+    try {
+      // Para cada género, obtener las películas que pertenecen a ese género
+      const genreMovieMap = {};
+      
+      for (const genre of genres) {
+        try {
+          const response = await fetch(
+            `http://localhost:7000/users/movies?genre_id=${genre.id}`,
+            {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            }
+          );
+          
+          if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.data.movies) {
+              // Guardar qué películas pertenecen a este género
+              data.data.movies.forEach(movie => {
+                if (!genreMovieMap[movie.id]) {
+                  genreMovieMap[movie.id] = [];
+                }
+                genreMovieMap[movie.id].push({
+                  id: genre.id,
+                  name: genre.name
+                });
+              });
+            }
+          }
+        } catch (err) {
+          console.error(`Error obteniendo películas del género ${genre.name}:`, err);
+        }
+      }
+
+      // Actualizar las películas con sus géneros
+      const moviesWithGenres = movies.map(movie => ({
+        ...movie,
+        genreIds: genreMovieMap[movie.id] ? genreMovieMap[movie.id].map(g => g.id) : [],
+        genreNames: genreMovieMap[movie.id] ? genreMovieMap[movie.id].map(g => g.name).join(', ') : 'Sin género'
+      }));
+
+      setCatalogo(moviesWithGenres);
+      setTotalPages(Math.ceil(moviesWithGenres.length / catalogoPerPage));
+    } catch (error) {
+      console.error('Error al cargar géneros de películas:', error);
+    }
+  };
+
+  // Cargar géneros cuando el componente tiene tanto las películas como los géneros
+  useEffect(() => {
+    if (catalogo.length > 0 && genres.length > 0 && !catalogo[0].genreNames) {
+      fetchAllMovieGenres(catalogo);
+    }
+  }, [catalogo, genres]);
+
+  // Datos de ejemplo para desarrollo
   const loadMockData = () => {
-    const mockMovies = Array.from({ length: 24 }, (_, i) => ({
-      id: i + 1,
-      title: `Película ${i + 1}`,
-      posterUrl: `https://picsum.photos/300/450?random=${i}`,
-      year: 2020 + Math.floor(Math.random() * 5),
-      genres: [genres[Math.floor(Math.random() * genres.length)]],
-      averageRating: (Math.random() * 4 + 1).toFixed(1),
-      reviewCount: Math.floor(Math.random() * 500) + 10
-    }));
-    setMovies(mockMovies);
-    setTotalPages(Math.ceil(mockMovies.length / moviesPerPage));
+    const mockCatalogo = Array.from({ length: 24 }, (_, i) => {
+      const randomGenreIds = genres.length > 0 
+        ? [genres[Math.floor(Math.random() * genres.length)].id] 
+        : [];
+      const randomGenreNames = randomGenreIds
+        .map(id => {
+          const genre = genres.find(g => g.id === id);
+          return genre ? genre.name : '';
+        })
+        .filter(name => name)
+        .join(', ');
+
+      return {
+        id: i + 1,
+        title: `Película ${i + 1}`,
+        posterUrl: `https://picsum.photos/300/450?random=${i}`,
+        year: 2020 + Math.floor(Math.random() * 5),
+        genreIds: randomGenreIds,
+        genreNames: randomGenreNames || 'Sin género',
+        averageRating: (Math.random() * 4 + 1).toFixed(1),
+        reviewCount: Math.floor(Math.random() * 500) + 10
+      };
+    });
+    
+    setCatalogo(mockCatalogo);
+    setTotalPages(Math.ceil(mockCatalogo.length / catalogoPerPage));
   };
 
   const applyFilters = () => {
-    let filtered = [...movies];
+    let filtered = [...catalogo];
+
+    // Filtro por búsqueda
     if (filters.searchTerm) {
       filtered = filtered.filter(movie =>
         movie.title.toLowerCase().includes(filters.searchTerm.toLowerCase())
       );
     }
+
+    // Filtro por géneros (usando genreIds)
     if (filters.selectedGenres.length > 0) {
       filtered = filtered.filter(movie =>
-        movie.genres.some(genre => filters.selectedGenres.includes(genre))
+        movie.genreIds && movie.genreIds.some(genreId => filters.selectedGenres.includes(genreId))
       );
     }
+
+    // Filtro por año
     if (filters.selectedYear) {
       filtered = filtered.filter(movie =>
         movie.year === parseInt(filters.selectedYear)
       );
     }
+
+    // Filtro por calificación mínima
     if (filters.minRating > 0) {
       filtered = filtered.filter(movie =>
         parseFloat(movie.averageRating) >= filters.minRating
       );
     }
-    setFilteredMovies(filtered);
+
+    setFilteredCatalogo(filtered);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    sessionStorage.removeItem('authToken');
-    navigate('/');
+  const handleSearchChange = (e) => {
+    setFilters({
+      ...filters,
+      searchTerm: e.target.value
+    });
   };
 
-  const handleSearchChange = (e) => setFilters({ ...filters, searchTerm: e.target.value });
-  const handleGenreToggle = (genre) => {
-    const newGenres = filters.selectedGenres.includes(genre)
-      ? filters.selectedGenres.filter(g => g !== genre)
-      : [...filters.selectedGenres, genre];
-    setFilters({ ...filters, selectedGenres: newGenres });
+  const handleGenreToggle = (genreId) => {
+    const newGenres = filters.selectedGenres.includes(genreId)
+      ? filters.selectedGenres.filter(g => g !== genreId)
+      : [...filters.selectedGenres, genreId];
+
+    setFilters({
+      ...filters,
+      selectedGenres: newGenres
+    });
   };
-  const handleYearChange = (e) => setFilters({ ...filters, selectedYear: e.target.value });
-  const handleRatingChange = (value) => setFilters({ ...filters, minRating: value });
-  const clearFilters = () => setFilters({ searchTerm: '', selectedGenres: [], selectedYear: '', minRating: 0 });
+
+  const handleYearChange = (e) => {
+    setFilters({
+      ...filters,
+      selectedYear: e.target.value
+    });
+  };
+
+  const handleRatingChange = (value) => {
+    setFilters({
+      ...filters,
+      minRating: value
+    });
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      searchTerm: '',
+      selectedGenres: [],
+      selectedYear: '',
+      minRating: 0
+    });
+  };
+
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
       setCurrentPage(newPage);
@@ -130,42 +308,30 @@ const Movies = () => {
     const stars = [];
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 >= 0.5;
+
     for (let i = 0; i < 5; i++) {
-      if (i < fullStars) stars.push(<span key={i} className="star full">★</span>);
-      else if (i === fullStars && hasHalfStar) stars.push(<span key={i} className="star half">★</span>);
-      else stars.push(<span key={i} className="star empty">☆</span>);
+      if (i < fullStars) {
+        stars.push(<span key={i} className="star full">★</span>);
+      } else if (i === fullStars && hasHalfStar) {
+        stars.push(<span key={i} className="star half">★</span>);
+      } else {
+        stars.push(<span key={i} className="star empty">☆</span>);
+      }
     }
+
     return stars;
   };
 
-  const displayedMovies = filteredMovies.length > 0 ? filteredMovies : movies;
-  const startIndex = (currentPage - 1) * moviesPerPage;
-  const endIndex = startIndex + moviesPerPage;
-  const paginatedMovies = displayedMovies.slice(startIndex, endIndex);
+  const displayedCatalogo = filteredCatalogo.length > 0 ? filteredCatalogo : catalogo;
+  const startIndex = (currentPage - 1) * catalogoPerPage;
+  const endIndex = startIndex + catalogoPerPage;
+  const paginatedCatalogo = displayedCatalogo.slice(startIndex, endIndex);
 
   return (
     <div className="movies-container">
-
-      {/* Barra de navegación */}
-      <nav className="navbar">
-        <div className="nav-left">
-          <h2 className="logo">🎬 MovieApp</h2>
-          <ul className="nav-links">
-            <li>Catálogo</li>
-            <li>Lectura Reseñas</li>
-            <li>Perfil</li>
-            <li>Reconocimiento Imagen</li>
-            <li>Recomendación por ánimo</li>
-            <li>Reseña Película</li>
-            <li>Traducción de Reseñas</li>
-          </ul>
-        </div>
-        <button className="logout-btn" onClick={handleLogout}>Cerrar sesión</button>
-      </nav>
-
       {/* Header */}
       <div className="movies-header">
-        <h1>Explora Películas</h1>
+        <h1>🎬 Explora Películas</h1>
         <p>Descubre tu próxima película favorita</p>
       </div>
 
@@ -180,16 +346,197 @@ const Movies = () => {
           className="search-input"
         />
         {filters.searchTerm && (
-          <button className="clear-search" onClick={() => setFilters({ ...filters, searchTerm: '' })}>✕</button>
+          <button
+            className="clear-search"
+            onClick={() => setFilters({ ...filters, searchTerm: '' })}
+          >
+            ✕
+          </button>
         )}
       </div>
 
       {/* Filtros */}
-      {/* (Resto del código original sin cambios) */}
+      <div className="filters-section">
+        <div className="filters-header">
+          <h3>🎯 Filtros</h3>
+          {(filters.selectedGenres.length > 0 || 
+            filters.selectedYear || 
+            filters.minRating > 0) && (
+            <button className="clear-filters-btn" onClick={clearFilters}>
+              Limpiar filtros
+            </button>
+          )}
+        </div>
 
-      {/* ... */}
+        {/* Filtro por Calificación */}
+        <div className="filter-group">
+          <label>⭐ Calificación mínima</label>
+          <div className="rating-filters">
+            {ratings.map((rating) => (
+              <button
+                key={rating.value}
+                className={`rating-btn ${filters.minRating === rating.value ? 'active' : ''}`}
+                onClick={() => handleRatingChange(rating.value)}
+              >
+                {rating.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Filtro por Año */}
+        <div className="filter-group">
+          <label htmlFor="year-filter">📅 Año de lanzamiento</label>
+          <select
+            id="year-filter"
+            value={filters.selectedYear}
+            onChange={handleYearChange}
+            className="year-select"
+          >
+            <option value="">Todos los años</option>
+            {years.map(year => (
+              <option key={year} value={year}>{year}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Filtro por Género */}
+        <div className="filter-group">
+          <label>🎭 Géneros</label>
+          <div className="genre-filters">
+            {genres.map((genre) => (
+              <button
+                key={genre.id}
+                className={`genre-filter-btn ${filters.selectedGenres.includes(genre.id) ? 'active' : ''}`}
+                onClick={() => handleGenreToggle(genre.id)}
+              >
+                {genre.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Contador de resultados */}
+      <div className="results-count">
+        {isLoading ? (
+          <span>Cargando películas...</span>
+        ) : (
+          <span>
+            📊 Mostrando {paginatedCatalogo.length} de {displayedCatalogo.length} películas
+          </span>
+        )}
+      </div>
+
+      {/* Grid de películas */}
+      {isLoading ? (
+        <div className="loading-container">
+          <div className="spinner-large"></div>
+          <p>Cargando películas...</p>
+        </div>
+      ) : paginatedCatalogo.length === 0 ? (
+        <div className="no-results">
+          <span className="no-results-icon">🎬</span>
+          <h3>No se encontraron películas</h3>
+          <p>Intenta ajustar tus filtros de búsqueda</p>
+          <button className="clear-filters-btn" onClick={clearFilters}>
+            Limpiar filtros
+          </button>
+        </div>
+      ) : (
+        <>
+          <div className="movies-grid">
+            {paginatedCatalogo.map((movie) => (
+              <div key={movie.id} className="movie-card">
+                <div className="movie-poster">
+                  <img
+                    src={movie.posterUrl}
+                    alt={movie.title}
+                    loading="lazy"
+                  />
+                  <div className="movie-overlay">
+                    <button className="view-details-btn">
+                      Ver detalles
+                    </button>
+                  </div>
+                </div>
+                <div className="movie-info">
+                  <h3 className="movie-title" title={movie.title}>
+                    {movie.title}
+                  </h3>
+                  <div className="movie-meta">
+                    <span className="movie-year">{movie.year}</span>
+                    <span className="separator">•</span>
+                    <span className="movie-genre">
+                      {movie.genreNames}
+                    </span>
+                  </div>
+                  <div className="movie-rating">
+                    <div className="stars">
+                      {renderStars(parseFloat(movie.averageRating))}
+                    </div>
+                    <span className="rating-value">
+                      {movie.averageRating}
+                    </span>
+                  </div>
+                  <div className="movie-reviews">
+                    <span className="review-icon">💬</span>
+                    <span>{movie.reviewCount} reseñas</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Paginación */}
+          {totalPages > 1 && (
+            <div className="pagination">
+              <button
+                className="pagination-btn"
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
+                ← Anterior
+              </button>
+              
+              <div className="pagination-numbers">
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let pageNum;
+                  if (totalPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i;
+                  } else {
+                    pageNum = currentPage - 2 + i;
+                  }
+
+                  return (
+                    <button
+                      key={pageNum}
+                      className={`pagination-number ${currentPage === pageNum ? 'active' : ''}`}
+                      onClick={() => handlePageChange(pageNum)}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <button
+                className="pagination-btn"
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+              >
+                Siguiente →
+              </button>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 };
 
-export default Movies;
+export default Catalogo;

@@ -1,0 +1,797 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.reviews-with-speech-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+}
+
+/* Header */
+.reviews-header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.reviews-header h2 {
+  color: #333;
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.header-subtitle {
+  color: #666;
+  font-size: 16px;
+}
+
+/* Controls */
+.reviews-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.sort-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sort-controls label {
+  color: #555;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.sort-controls select {
+  padding: 8px 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.sort-controls select:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.audio-info {
+  display: flex;
+  gap: 10px;
+}
+
+.info-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.badge-icon {
+  font-size: 16px;
+}
+
+/* Reviews List */
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.loading-reviews {
+  padding: 60px;
+  text-align: center;
+}
+
+.spinner-large {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(102, 126, 234, 0.2);
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-reviews p {
+  color: #666;
+  font-size: 16px;
+}
+
+.no-reviews {
+  padding: 60px;
+  text-align: center;
+  background: white;
+  border-radius: 15px;
+}
+
+.no-reviews-icon {
+  font-size: 64px;
+  display: block;
+  margin-bottom: 20px;
+  opacity: 0.3;
+}
+
+.no-reviews h3 {
+  color: #333;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.no-reviews p {
+  color: #666;
+  font-size: 16px;
+}
+
+/* Review Card */
+.review-card-speech {
+  background: white;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.review-card-speech:hover {
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.12);
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.reviewer-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.reviewer-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.reviewer-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.reviewer-name {
+  color: #333;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.review-date {
+  color: #999;
+  font-size: 13px;
+}
+
+.review-rating {
+  display: flex;
+  gap: 3px;
+}
+
+.star {
+  font-size: 20px;
+}
+
+.star.filled {
+  color: #ffc107;
+}
+
+.star.empty {
+  color: #e0e0e0;
+}
+
+/* Review Content */
+.review-content {
+  margin-bottom: 20px;
+}
+
+.language-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.flag {
+  font-size: 18px;
+}
+
+.lang-name {
+  color: #666;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.word-count {
+  color: #999;
+  font-size: 12px;
+  margin-left: auto;
+}
+
+.review-title {
+  color: #333;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.review-text {
+  color: #555;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+/* Audio Controls Section */
+.audio-controls-section {
+  padding: 20px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+  border-radius: 12px;
+  margin-bottom: 15px;
+}
+
+.audio-player {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Player Buttons */
+.player-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.play-pause-btn,
+.stop-btn {
+  width: 50px;
+  height: 50px;
+  border: none;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.play-pause-btn:hover:not(:disabled),
+.stop-btn:hover:not(:disabled) {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+}
+
+.play-pause-btn:disabled,
+.stop-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.play-pause-btn.playing {
+  background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+  box-shadow: 0 4px 15px rgba(245, 101, 101, 0.4);
+}
+
+.stop-btn {
+  width: 40px;
+  height: 40px;
+  background: #555;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.icon {
+  font-size: 20px;
+}
+
+.spinner-small {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* Time Display */
+.time-display {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #555;
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  margin-left: 10px;
+}
+
+.time-separator {
+  color: #999;
+}
+
+/* Progress Section */
+.progress-section {
+  position: relative;
+  height: 8px;
+  background: #d0d0d0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.progress-bar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: #667eea;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.5);
+}
+
+.progress-bar::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: #667eea;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.5);
+}
+
+.progress-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  border-radius: 4px;
+  transition: width 0.1s linear;
+  z-index: 1;
+}
+
+/* Additional Controls */
+.additional-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  padding-top: 10px;
+  border-top: 1px solid #ddd;
+}
+
+.speed-control,
+.voice-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.speed-control label,
+.voice-selector label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #555;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.control-icon {
+  font-size: 16px;
+}
+
+.speed-control select,
+.voice-selector select {
+  padding: 6px 10px;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.speed-control select:focus,
+.voice-selector select:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.download-audio-btn,
+.settings-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: white;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  color: #555;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.download-audio-btn:hover:not(:disabled),
+.settings-btn:hover {
+  border-color: #667eea;
+  color: #667eea;
+}
+
+.download-audio-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Audio Error */
+.audio-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #fee;
+  border: 1px solid #fcc;
+  border-radius: 8px;
+  color: #c33;
+  font-size: 13px;
+}
+
+.error-icon {
+  font-size: 16px;
+}
+
+/* Settings Panel */
+.settings-panel {
+  margin-top: 15px;
+  padding: 20px;
+  background: white;
+  border-radius: 10px;
+  border: 2px solid #e0e0e0;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.settings-panel h5 {
+  color: #333;
+  font-size: 16px;
+  margin-bottom: 15px;
+}
+
+.setting-item {
+  margin-bottom: 20px;
+}
+
+.setting-item:last-child {
+  margin-bottom: 0;
+}
+
+.setting-item label {
+  display: block;
+  color: #555;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.voice-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.voice-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  color: #555;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.voice-option:hover:not(:disabled) {
+  border-color: #667eea;
+  color: #667eea;
+  transform: translateY(-2px);
+}
+
+.voice-option.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-color: #667eea;
+}
+
+.voice-option:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.voice-icon {
+  font-size: 18px;
+}
+
+.playback-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.setting-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.setting-row span {
+  color: #666;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.setting-row input[type="range"] {
+  width: 100%;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: #e0e0e0;
+  border-radius: 3px;
+  outline: none;
+}
+
+.setting-row input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  background: #667eea;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.setting-row input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background: #667eea;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+/* Review Footer */
+.review-footer {
+  padding-top: 15px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.review-helpful {
+  display: flex;
+  gap: 10px;
+}
+
+.helpful-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  color: #555;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.helpful-btn:hover {
+  border-color: #48bb78;
+  color: #48bb78;
+}
+
+/* Info Section */
+.info-section {
+  margin-top: 40px;
+}
+
+.info-card {
+  background: white;
+  border-radius: 15px;
+  padding: 30px;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+}
+
+.info-card h3 {
+  color: #333;
+  font-size: 24px;
+  margin-bottom: 15px;
+}
+
+.info-content p {
+  color: #555;
+  font-size: 15px;
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+
+.features-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background: #f9f9f9;
+  border-radius: 10px;
+  color: #555;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.feature-icon {
+  font-size: 22px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .reviews-with-speech-container {
+    padding: 30px 15px;
+  }
+
+  .reviews-header h2 {
+    font-size: 28px;
+  }
+
+  .reviews-controls {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .review-card-speech {
+    padding: 20px;
+  }
+
+  .review-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .player-buttons {
+    flex-wrap: wrap;
+  }
+
+  .additional-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .speed-control,
+  .voice-selector,
+  .download-audio-btn,
+  .settings-btn {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .voice-options {
+    flex-direction: column;
+  }
+
+  .voice-option {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .features-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .reviews-header h2 {
+    font-size: 24px;
+  }
+
+  .review-title {
+    font-size: 18px;
+  }
+
+  .review-text {
+    font-size: 14px;
+  }
+
+  .audio-controls-section {
+    padding: 15px;
+  }
+
+  .play-pause-btn {
+    width: 45px;
+    height: 45px;
+  }
+
+  .stop-btn {
+    width: 35px;
+    height: 35px;
+  }
+
+  .time-display {
+    font-size: 12px;
+  }
+
+  .info-card {
+    padding: 20px;
+  }
+}

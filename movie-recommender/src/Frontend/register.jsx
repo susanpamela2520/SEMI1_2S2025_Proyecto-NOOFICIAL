@@ -198,17 +198,22 @@ const Register = () => {
       if (!response.ok) {
         // Mostrar el error que devuelve tu API
         setErrors({
-          general: data.error || 'Error al registrar usuario. Por favor, intenta nuevamente.'
+          general: data.message || 'Error al registrar usuario. Por favor, intenta nuevamente.'
         });
         return;
       }
 
       // Registro exitoso
-      // Tu API devuelve: { userId: result.rows[0].id }
       console.log('Registro exitoso:', data);
       
-      // Guardar el userId en localStorage
-      localStorage.setItem('userId', data.userId);
+      // CORREGIDO: Guardar el userId correctamente según la respuesta de tu API
+      // Tu API devuelve: { success: true, message: "...", data: { user_id: X } }
+      if (data.success && data.data && data.data.user_id) {
+        localStorage.setItem('userId', data.data.user_id.toString());
+        console.log('✅ userId guardado correctamente:', data.data.user_id);
+      } else {
+        console.warn('⚠️ No se pudo obtener el user_id de la respuesta:', data);
+      }
       
       // Limpiar errores
       setErrors({});
@@ -217,11 +222,7 @@ const Register = () => {
       alert('¡Registro exitoso! Redirigiendo al login...');
       
       // Redirigir al login
-      // Si usas React Router:
-      // navigate('/login');
-      
-      // Si usas window.location:
-    navigate('/');
+      navigate('/');
 
     } catch (error) {
       console.error('Error en el registro:', error);

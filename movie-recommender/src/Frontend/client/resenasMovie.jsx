@@ -1,18 +1,21 @@
 import { useState, useEffect } from 'react';
 import './resenasMovie.css';
 import Navbar from './Navbar.jsx';
+import { useLocation } from 'react-router-dom';
 
-const resenasMovie = ({ movieId }) => {
+const resenasMovie = () => {
   const [reviews, setReviews] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [newReview, setNewReview] = useState({
     rating: 5,
     title: '',
     content: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [sortBy, setSortBy] = useState('recent'); // recent, highest, lowest
+  const [sortBy, setSortBy] = useState('recent');
   const [filterRating, setFilterRating] = useState('all');
+  const location = useLocation();
+  const {movieId} = location.state || {};
   
   // Estado para traducciones
   const [translatingReviews, setTranslatingReviews] = useState({});
@@ -28,32 +31,8 @@ const resenasMovie = ({ movieId }) => {
   ];
 
   useEffect(() => {
-    fetchReviews();
-  }, [movieId, sortBy, filterRating]);
-
-  const fetchReviews = async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch(
-        `TU_API_URL/movies/${movieId}/reviews?sort=${sortBy}&rating=${filterRating}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('authToken') || sessionStorage.getItem('authToken')}`
-          }
-        }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        setReviews(data.reviews);
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      loadMockReviews();
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    loadMockReviews();
+  }, [sortBy, filterRating]);
 
   // Datos de ejemplo para desarrollo
   const loadMockReviews = () => {
@@ -119,7 +98,34 @@ const resenasMovie = ({ movieId }) => {
         notHelpful: 19
       }
     ];
-    setReviews(mockReviews);
+    
+    // Aplicar filtros localmente
+    let filteredReviews = [...mockReviews];
+    
+    // Filtrar por rating
+    if (filterRating !== 'all') {
+      filteredReviews = filteredReviews.filter(r => r.rating === parseInt(filterRating));
+    }
+    
+    // Ordenar
+    switch (sortBy) {
+      case 'highest':
+        filteredReviews.sort((a, b) => b.rating - a.rating);
+        break;
+      case 'lowest':
+        filteredReviews.sort((a, b) => a.rating - b.rating);
+        break;
+      case 'helpful':
+        filteredReviews.sort((a, b) => b.helpful - a.helpful);
+        break;
+      case 'recent':
+      default:
+        filteredReviews.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        break;
+    }
+    
+    setReviews(filteredReviews);
+    setIsLoading(false);
   };
 
   const handleInputChange = (e) => {
@@ -141,27 +147,86 @@ const resenasMovie = ({ movieId }) => {
     e.preventDefault();
     
     if (!newReview.title.trim() || !newReview.content.trim()) {
+      alert('Por favor, completa todos los campos de la reseña');
+      return;
+    }
+
+    if (!movieId) {
+      alert('Error: No se encontró el ID de la película');
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(`TU_API_URL/movies/${movieId}/reviews`, {
+      // Obtener el user_id desde localStorage
+      const userId = localStorage.getItem('userId');
+      
+      if (!userId) {
+        alert('Error: No se encontró el ID de usuario. Por favor, inicia sesión nuevamente.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Combinar título y contenido para el review_text
+      const fullReviewText = `${newReview.title}. ${newReview.content}`;
+
+      // Preparar el body según tu endpoint en users.js
+      const requestBody = {
+        user_id: parseInt(userId),
+        movie_id: parseInt(movieId),
+        rating: newReview.rating,
+        review_text: fullReviewText,
+        sentiment: null,
+        emotion_ids: []
+      };
+
+      console.log('📤 Enviando reseña a /users/reviews:', requestBody);
+
+      // LA RUTA CORRECTA ES /users/reviews
+      const response = await fetch('http://localhost:7000/users/reviews', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken') || sessionStorage.getItem('authToken')}`
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(newReview)
+        body: JSON.stringify(requestBody)
       });
 
-      if (response.ok) {
+      const data = await response.json();
+      console.log('📥 Respuesta recibida:', data);
+
+      if (response.ok && data.success) {
+        alert('✅ Reseña publicada exitosamente');
+        
+        // Agregar la nueva reseña a la lista local
+        const newReviewItem = {
+          id: Date.now().toString(),
+          userId: {
+            id: userId,
+            username: 'Tu usuario',
+            profilePhoto: 'https://i.pravatar.cc/150?img=10'
+          },
+          rating: newReview.rating,
+          title: newReview.title,
+          content: newReview.content,
+          language: 'es',
+          detectedLanguage: 'Spanish',
+          createdAt: new Date(),
+          helpful: 0,
+          notHelpful: 0
+        };
+        
+        setReviews([newReviewItem, ...reviews]);
+        
+        // Limpiar el formulario
         setNewReview({ rating: 5, title: '', content: '' });
-        fetchReviews();
+      } else {
+        console.error('❌ Error en la respuesta:', data);
+        alert(`Error al publicar reseña: ${data.message || 'Error desconocido'}`);
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error('❌ Error al enviar reseña:', error);
+      alert('Error al conectar con el servidor. Verifica que el backend esté corriendo en el puerto 7000.');
     } finally {
       setIsSubmitting(false);
     }
@@ -171,77 +236,34 @@ const resenasMovie = ({ movieId }) => {
     const review = reviews.find(r => r.id === reviewId);
     if (!review) return;
 
-    // Verificar si ya está traducida
     const translationKey = `${reviewId}_${targetLanguage}`;
     if (translatedReviews[translationKey]) {
-      return; // Ya traducida
+      return;
     }
 
-    // Marcar como traduciendo
     setTranslatingReviews(prev => ({ ...prev, [reviewId]: true }));
 
-    try {
-      const response = await fetch('TU_API_URL/translate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken') || sessionStorage.getItem('authToken')}`
-        },
-        body: JSON.stringify({
-          reviewId: reviewId,
-          title: review.title,
-          content: review.content,
-          sourceLanguage: review.language,
-          targetLanguage: targetLanguage
-        })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        
-        setTranslatedReviews(prev => ({
-          ...prev,
-          [translationKey]: {
-            title: data.translatedTitle,
-            content: data.translatedContent,
-            targetLanguage: targetLanguage
-          }
-        }));
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      // Simulación para desarrollo
-      simulateTranslation(reviewId, targetLanguage, review);
-    } finally {
-      setTranslatingReviews(prev => ({ ...prev, [reviewId]: false }));
-    }
-  };
-
-  const simulateTranslation = (reviewId, targetLanguage, review) => {
     setTimeout(() => {
-      const translationKey = `${reviewId}_${targetLanguage}`;
-      
-      // Traducciones simuladas
       const mockTranslations = {
-        'es': {
-          title: 'Traducción al español',
-          content: 'Este es un contenido traducido automáticamente al español desde el idioma original.'
+        en: {
+          title: 'Translated Title',
+          content: 'This is a simulated translation. In production, this would call your translation API endpoint.'
         },
-        'en': {
-          title: 'English Translation',
-          content: 'This is automatically translated content to English from the original language.'
+        fr: {
+          title: 'Titre Traduit',
+          content: 'Ceci est une traduction simulée. En production, cela appellerait votre point de terminaison API de traduction.'
         },
-        'fr': {
-          title: 'Traduction française',
-          content: 'Ceci est un contenu traduit automatiquement en français depuis la langue d\'origine.'
+        de: {
+          title: 'Übersetzter Titel',
+          content: 'Dies ist eine simulierte Übersetzung. In der Produktion würde dies Ihren Übersetzungs-API-Endpunkt aufrufen.'
         },
-        'de': {
-          title: 'Deutsche Übersetzung',
-          content: 'Dies ist automatisch übersetzter Inhalt auf Deutsch aus der Originalsprache.'
+        it: {
+          title: 'Titolo Tradotto',
+          content: 'Questa è una traduzione simulata. In produzione, questo chiamerebbe il tuo endpoint API di traduzione.'
         },
-        'it': {
-          title: 'Traduzione italiana',
-          content: 'Questo è un contenuto tradotto automaticamente in italiano dalla lingua originale.'
+        es: {
+          title: review.title,
+          content: review.content
         }
       };
 
@@ -249,18 +271,37 @@ const resenasMovie = ({ movieId }) => {
         ...prev,
         [translationKey]: mockTranslations[targetLanguage] || mockTranslations['en']
       }));
-      
+
       setTranslatingReviews(prev => ({ ...prev, [reviewId]: false }));
     }, 1500);
   };
 
-  const showOriginalReview = (reviewId, targetLanguage) => {
-    const translationKey = `${reviewId}_${targetLanguage}`;
+  const showOriginalReview = (reviewId, targetLang) => {
+    const translationKey = `${reviewId}_${targetLang}`;
     setTranslatedReviews(prev => {
-      const newState = { ...prev };
-      delete newState[translationKey];
-      return newState;
+      const newTranslations = { ...prev };
+      delete newTranslations[translationKey];
+      return newTranslations;
     });
+  };
+
+  const getLanguageInfo = (code) => {
+    const lang = supportedLanguages.find(l => l.code === code);
+    return lang || { code: 'unknown', name: 'Desconocido', flag: '🏳️' };
+  };
+
+  const formatDate = (date) => {
+    const d = new Date(date);
+    const now = new Date();
+    const diffTime = Math.abs(now - d);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) return 'Hoy';
+    if (diffDays === 1) return 'Ayer';
+    if (diffDays < 7) return `Hace ${diffDays} días`;
+    if (diffDays < 30) return `Hace ${Math.floor(diffDays / 7)} semanas`;
+    if (diffDays < 365) return `Hace ${Math.floor(diffDays / 30)} meses`;
+    return d.toLocaleDateString('es-ES');
   };
 
   const renderStars = (rating, interactive = false, onRatingChange = null) => {
@@ -279,38 +320,24 @@ const resenasMovie = ({ movieId }) => {
     return stars;
   };
 
-  const formatDate = (date) => {
-    const d = new Date(date);
-    const now = new Date();
-    const diffTime = Math.abs(now - d);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 0) return 'Hoy';
-    if (diffDays === 1) return 'Ayer';
-    if (diffDays < 7) return `Hace ${diffDays} días`;
-    if (diffDays < 30) return `Hace ${Math.floor(diffDays / 7)} semanas`;
-    
-    return d.toLocaleDateString('es-ES', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
-  };
-
-  const getLanguageInfo = (langCode) => {
-    return supportedLanguages.find(l => l.code === langCode) || 
-           { code: langCode, name: langCode.toUpperCase(), flag: '🌐' };
-  };
-
   return (
     <>
-    <Navbar currentPage="Reseñas Película" />
-    <div className="movie-reviews-container">
+    <Navbar />
+    <div className="reviews-container">
       <div className="reviews-header">
-        <h2>Reseñas de Usuarios</h2>
-        <div className="reviews-stats">
-          <div className="total-reviews">
-            {reviews.length} reseña{reviews.length !== 1 ? 's' : ''}
+        <h1 className="page-title">Reseñas de la Película</h1>
+        <div className="movie-rating-summary">
+          <div className="average-rating">
+            <span className="rating-number">
+              {reviews.length > 0 
+                ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1)
+                : 'N/A'
+              }
+            </span>
+            <div className="rating-stars">
+              {reviews.length > 0 && renderStars(Math.round(reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length))}
+            </div>
+            <span className="rating-count">{reviews.length} reseñas</span>
           </div>
         </div>
       </div>
@@ -436,7 +463,6 @@ const resenasMovie = ({ movieId }) => {
                 </div>
 
                 <div className="review-content-section">
-                  {/* Indicador de idioma original */}
                   <div className="language-indicator">
                     <span className="language-flag">
                       {getLanguageInfo(review.language).flag}
@@ -459,7 +485,6 @@ const resenasMovie = ({ movieId }) => {
                     {isTranslated ? translatedData.content : review.content}
                   </p>
 
-                  {/* Botones de traducción */}
                   <div className="translation-controls">
                     {!isTranslated ? (
                       <>

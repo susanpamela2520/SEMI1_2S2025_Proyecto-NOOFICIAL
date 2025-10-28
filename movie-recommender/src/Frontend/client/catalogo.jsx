@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import './catalogo.css';
 import Navbar from './Navbar';
+import { useNavigate } from 'react-router-dom';
 
 const Catalogo = () => {
   const [catalogo, setCatalogo] = useState([]);
@@ -10,6 +11,7 @@ const Catalogo = () => {
   const [totalPages, setTotalPages] = useState(1);
   const catalogoPerPage = 12;
   const [genres, setGenres] = useState([]);
+  const navigate = useNavigate();
 
   // Estados de filtros
   const [filters, setFilters] = useState({
@@ -613,7 +615,7 @@ const Catalogo = () => {
                     loading="lazy"
                   />
                   <div className="movie-overlay">
-                    <button className="view-details-btn">
+                    <button className="view-details-btn" onClick={() => navigate('/resenasMovie', {state: { movieId: movie.id }})}>
                       Ver detalles
                     </button>
                   </div>

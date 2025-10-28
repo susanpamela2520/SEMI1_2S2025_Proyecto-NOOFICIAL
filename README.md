@@ -156,7 +156,7 @@ Ventajas:
 - Alta calidad de traducción con redes neuronales.
 - Integración con S3, Lambda y otros servicios.
 
-### 6.4 Amazon Polly
+### 6.5 Amazon Polly
 Descripción:
 Convierte texto en voz realista mediante tecnologías de text-to-speech (TTS).
 
@@ -178,7 +178,7 @@ Ventajas:
 - Generación bajo demanda o por lotes.
 - Escalable y de bajo costo.
 
-### 6.4 Amazon Comprehend
+### 6.6 Amazon Comprehend
 Descripción:
 Servicio de procesamiento de lenguaje natural (NLP) que usa machine learning para analizar texto y extraer significado.
 
@@ -201,7 +201,7 @@ Ventajas:
 - Compatible con datos en S3 y bases de datos AWS.
 - Escalable y personalizable.
 
-### 6.4 Amazon Rekognition
+### 6.7 Amazon Rekognition
 Descripción:
 Servicio de visión artificial que analiza imágenes y videos usando redes neuronales profundas.
 
@@ -224,7 +224,7 @@ Ventajas:
 - Integración con S3, Lambda y Kinesis Video Streams.
 - Escalabilidad y análisis en tiempo real.
 
-### 6.4 Amazon Api Gateway
+### 6.8 Amazon Api Gateway
 Descripción:
 Permite crear, publicar y gestionar APIs de forma segura y escalable. Es un punto de entrada para microservicios o backends sin servidor.
 
@@ -245,3 +245,30 @@ Ventajas:
 - Escalable automáticamente.
 - Seguridad integrada.
 - Compatible con múltiples protocolos.
+
+### 6.9 Amazon CloudFront
+Descripción:
+Amazon CloudFront es un servicio de red de entrega de contenido (CDN) que distribuye datos, videos, aplicaciones y API de manera global con baja latencia y alta velocidad de transferencia. Se integra de forma nativa con otros servicios de AWS, como Amazon S3, EC2, API Gateway, Elastic Load Balancing y Lambda@Edge, lo que permite acelerar la entrega de contenido estático y dinámico a los usuarios finales.
+
+Características:
+
+- Red global con más de 400 puntos de presencia (Edge Locations) distribuidos en múltiples regiones.
+- Compatibilidad con contenido estático y dinámico, así como transmisión de video en tiempo real (live streaming).
+- Integración con AWS Shield y AWS WAF para proteger contra ataques DDoS y vulnerabilidades comunes.
+- Soporte para TLS/SSL, autenticación mediante firmas, y control de acceso a contenido privado.
+- Caché configurable y políticas de expiración flexibles para optimizar el rendimiento y reducir costos.
+
+Casos de uso:
+
+- Aceleración del acceso a sitios web y aplicaciones alojadas en Amazon S3 o servidores EC2.
+- Distribución global de archivos multimedia (imágenes, videos, música, juegos).
+- Optimización de APIs distribuidas a través de API Gateway.
+- Transmisión de contenido en vivo o bajo demanda (video streaming).
+
+Ventajas:
+
+- Baja latencia: entrega del contenido desde el punto geográficamente más cercano al usuario.
+- Escalabilidad automática: maneja grandes volúmenes de tráfico sin intervención manual.
+- Alta seguridad: integración con servicios de protección de red de AWS.
+- Reducción de costos: disminuye la carga de los servidores de origen y el consumo de ancho de banda.
+- Integración perfecta: funciona en conjunto con S3, Load Balancer, EC2 y Lambda para ofrecer una arquitectura moderna y eficiente.

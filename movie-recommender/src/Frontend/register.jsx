@@ -166,31 +166,6 @@ const Register = () => {
     }
   };
 
-  const uploadImageToCloudinary = async (file) => {
-    // Subir la imagen a Cloudinary (o cualquier servicio de almacenamiento)
-    // Por ahora devolvemos una URL de ejemplo
-    // En producción, deberías implementar la subida real a S3, Cloudinary, etc.
-    
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'tu_upload_preset'); // Configura esto en Cloudinary
-    
-    try {
-      // Ejemplo con Cloudinary - ajusta según tu servicio
-      const response = await fetch('https://api.cloudinary.com/v1_1/tu_cloud_name/image/upload', {
-        method: 'POST',
-        body: formData
-      });
-      
-      const data = await response.json();
-      return data.secure_url;
-    } catch (error) {
-      console.error('Error al subir imagen:', error);
-      // Por ahora devolvemos el preview local como fallback
-      return photoPreview;
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -201,12 +176,6 @@ const Register = () => {
     setIsLoading(true);
 
     try {
-      // Subir la foto de perfil primero (si implementas Cloudinary/S3)
-      // let profilePhotoUrl = await uploadImageToCloudinary(formData.profilePhoto);
-      
-      // Por ahora usamos el preview como URL temporal
-      let profilePhotoUrl = photoPreview;
-
       // Conectar con tu endpoint de registro
       // Ajusta la URL base según tu configuración
       const response = await fetch('http://localhost:7000/users/register', {
@@ -219,7 +188,7 @@ const Register = () => {
           username: formData.username,
           email: formData.email,
           password: formData.password,             // El backend lo encriptará con bcrypt
-          profile_photo_url: profilePhotoUrl,      // URL de la foto
+          profile_photo_url: photoPreview,         // Base64 de la imagen
           favorite_genres: formData.favoriteGenres // Array de géneros
         })
       });

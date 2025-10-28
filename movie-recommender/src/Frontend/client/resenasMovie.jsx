@@ -304,7 +304,7 @@ const resenasMovie = ({ movieId }) => {
 
   return (
     <>
-    <Navbar currentPage="Reseñas de Película" />
+    <Navbar currentPage="Reseñas Película" />
     <div className="movie-reviews-container">
       <div className="reviews-header">
         <h2>Reseñas de Usuarios</h2>

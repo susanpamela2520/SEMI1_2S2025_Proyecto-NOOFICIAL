@@ -312,7 +312,7 @@ const recomendacionEmocional = () => {
 
   return (
     <>
-      <Navbar currentPage="Recomendación Emocional" />
+      <Navbar currentPage="Recomendación por Ánimo" />
     <div className="emotional-recommendations-container">
       <div className="emotional-header">
         <h1>🎭 Recomendaciones por Estado Emocional</h1>

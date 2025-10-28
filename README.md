@@ -11,7 +11,49 @@
 | 201906099  | Daniel Moisés Chan Pelico            |
 
 ## 2. Objetivos del proyecto
+
+El objetivo principal del proyecto es diseñar e implementar una arquitectura escalable y distribuida en AWS que permita gestionar de forma eficiente un sistema de usuarios y películas, integrando análisis automatizado de reseñas, reconocimiento de imágenes y servicios de traducción y voz.
+
+De forma específica, el proyecto busca:
+
+- Optimizar el acceso y la entrega de contenido a los usuarios mediante el uso de Amazon CloudFront y un sitio web estático alojado en Amazon S3, garantizando baja latencia y alta disponibilidad.
+
+- Implementar un backend distribuido con Elastic Load Balancer y dos instancias EC2 conectadas a una base de datos MySQL en Amazon RDS, para almacenar información de usuarios, películas, reseñas, películas vistas y favoritas.
+
+- Incorporar inteligencia artificial y automatización a través de AWS Lambda, permitiendo la integración con servicios cognitivos como Rekognition, Polly, Comprehend y Translate para el análisis multimedia y de texto.
+
+- Facilitar la gestión de archivos multimedia, permitiendo que los usuarios suban imágenes de perfil y portadas de películas directamente a Amazon S3 mediante funciones Lambda.
+
+En conjunto, estos objetivos buscan demostrar una solución moderna basada en la nube que combine rendimiento, escalabilidad, inteligencia artificial y experiencia de usuario mejorada.
+
 ## 3. Descripción del proyecto
+El proyecto consiste en el desarrollo de una plataforma web alojada completamente en la nube de AWS, diseñada para la gestión y análisis de contenido cinematográfico generado por usuarios.
+
+El sistema se estructura en varias capas conectadas entre sí:
+
+1. Capa de acceso (Frontend):
+El usuario interactúa con la aplicación a través de un sitio web estático distribuido por Amazon CloudFront, cuyo contenido se encuentra hospedado en un bucket de Amazon S3. Esta configuración permite una entrega rápida del frontend y una experiencia fluida a nivel global.
+
+2. Capa de aplicación (Backend):
+Las solicitudes del frontend son procesadas mediante un Elastic Load Balancer, que distribuye el tráfico entre dos instancias EC2 responsables de manejar la lógica de negocio principal.
+Ambas instancias se conectan a una base de datos MySQL en Amazon RDS, donde se almacenan los datos de usuarios, películas, películas vistas, favoritas y las reseñas realizadas.
+
+3. Capa de servicios inteligentes (Serverless):
+Paralelamente, el frontend también se comunica con API Gateway, que actúa como punto de entrada para las solicitudes dirigidas a funciones AWS Lambda.
+Estas funciones permiten integrar servicios de inteligencia artificial:
+
+    - Amazon Rekognition: identifica portadas de películas mediante reconocimiento de imágenes.
+
+    - Amazon Polly: convierte las reseñas escritas por usuarios en voz, ofreciendo accesibilidad y dinamismo.
+
+    - Amazon Comprehend: analiza el sentimiento expresado en las reseñas (positivo, negativo o neutro).
+
+    - Amazon Translate: traduce reseñas a diferentes idiomas para usuarios internacionales.
+
+    - Funciones adicionales Lambda: permiten subir imágenes de perfil y portadas al bucket S3.
+
+En conjunto, esta arquitectura aprovecha los servicios gestionados de AWS para ofrecer una plataforma altamente escalable, inteligente, segura y con tiempos de respuesta optimizados, orientada a la experiencia del usuario y al análisis automatizado de contenido.
+
 ## 4. Arquitectura implementada
 
 ![Arquitectura](img/Arquitectura.png)
